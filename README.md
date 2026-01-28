@@ -28,7 +28,7 @@ npm run build
 
 The project is configured for GitHub Pages deployment via GitHub Actions. Every push to `main` triggers an automatic build and deploy.
 
-Live at: `https://<username>.github.io/diagnostic-game/`
+Live at: `https://felixholm.github.io/diagnostic-game/`
 
 ## Project Structure
 
