@@ -1,0 +1,667 @@
+{
+  "case_id": "dizziness_001",
+  "title": "Acute Dizziness",
+  "patient_presentation": {
+    "age": 58,
+    "sex": "female",
+    "chief_complaint": "Dizziness for the past 3 days",
+    "initial_description": "A 58-year-old woman presents with dizziness that started 3 days ago. She describes feeling unsteady and reports the room sometimes spins."
+  },
+  "true_diagnosis": "vestibular_neuritis",
+  "diagnoses": [
+    { "id": "bppv", "name": "BPPV", "prior_probability": 0.25, "color": "#3b82f6" },
+    { "id": "vestibular_neuritis", "name": "Vestibular Neuritis", "prior_probability": 0.15, "color": "#10b981" },
+    { "id": "vestibular_migraine", "name": "Vestibular Migraine", "prior_probability": 0.20, "color": "#8b5cf6" },
+    { "id": "menieres", "name": "Meniere's Disease", "prior_probability": 0.10, "color": "#f59e0b" },
+    { "id": "orthostatic", "name": "Orthostatic Hypotension", "prior_probability": 0.15, "color": "#ec4899" },
+    { "id": "stroke", "name": "Posterior Stroke", "prior_probability": 0.15, "color": "#ef4444", "critical": { "label": "Life-Threatening", "reason": "Posterior circulation stroke can mimic benign vestibular conditions but carries high morbidity and mortality if missed. Urgent neuroimaging and neurology consultation are required. The HINTS exam is more sensitive than early CT for posterior fossa infarction." } }
+  ],
+  "actions": [
+    {
+      "id": "duration_continuous",
+      "type": "history",
+      "question": "Has the dizziness been continuous for days?",
+      "description": "Assesses temporal pattern to distinguish acute vestibular syndrome from episodic vestibular disorders.",
+      "cost": 1,
+      "answer": "Yes, it's been constant since it started 3 days ago.",
+      "lr": { "bppv": 0.2, "vestibular_neuritis": 4.0, "vestibular_migraine": 0.4, "menieres": 0.3, "orthostatic": 0.3, "stroke": 3.0 },
+      "potential_findings": [
+        {
+          "finding": "Continuous vestibular symptoms",
+          "description": "Persistent dizziness without remission, consistent with acute vestibular syndrome.",
+          "lr": { "bppv": 0.2, "vestibular_neuritis": 4.0, "vestibular_migraine": 0.4, "menieres": 0.3, "orthostatic": 0.3, "stroke": 3.0 }
+        },
+        {
+          "finding": "Episodic symptoms with intervals",
+          "description": "Recurrent discrete episodes with symptom-free intervals between attacks.",
+          "lr": { "bppv": 3.0, "vestibular_neuritis": 0.3, "vestibular_migraine": 2.5, "menieres": 3.0, "orthostatic": 2.0, "stroke": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "duration_seconds",
+      "type": "history",
+      "question": "Do episodes last only seconds to less than a minute?",
+      "description": "Screens for paroxysmal positional vertigo by identifying brief, self-limiting episodes typical of canalithiasis.",
+      "cost": 1,
+      "answer": "No, it's not like brief spells. It's constant.",
+      "lr": { "bppv": 0.3, "vestibular_neuritis": 1.2, "vestibular_migraine": 0.8, "menieres": 0.5, "orthostatic": 0.9, "stroke": 0.8 },
+      "potential_findings": [
+        {
+          "finding": "Brief paroxysmal episodes",
+          "description": "Seconds-long vertigo spells, characteristic of posterior canal canalithiasis.",
+          "lr": { "bppv": 4.0, "vestibular_neuritis": 0.2, "vestibular_migraine": 0.5, "menieres": 0.4, "orthostatic": 1.5, "stroke": 0.3 }
+        },
+        {
+          "finding": "Non-paroxysmal symptoms",
+          "description": "Sustained or prolonged symptoms inconsistent with typical BPPV presentation.",
+          "lr": { "bppv": 0.3, "vestibular_neuritis": 1.2, "vestibular_migraine": 0.8, "menieres": 0.5, "orthostatic": 0.9, "stroke": 0.8 }
+        }
+      ]
+    },
+    {
+      "id": "trigger_head_position",
+      "type": "history",
+      "question": "Is it triggered by head position changes?",
+      "description": "Identifies positional triggers suggestive of peripheral canalithiasis or central positional pathology.",
+      "cost": 1,
+      "answer": "It gets worse when I move my head, but it doesn't go away when I'm still.",
+      "lr": { "bppv": 0.8, "vestibular_neuritis": 1.5, "vestibular_migraine": 0.8, "menieres": 0.5, "orthostatic": 0.3, "stroke": 1.2 },
+      "potential_findings": [
+        {
+          "finding": "Strictly positional vertigo",
+          "description": "Symptoms occur exclusively with position changes and resolve at rest.",
+          "lr": { "bppv": 5.0, "vestibular_neuritis": 0.3, "vestibular_migraine": 0.7, "menieres": 0.5, "orthostatic": 0.5, "stroke": 0.3 }
+        },
+        {
+          "finding": "Position-aggravated persistent symptoms",
+          "description": "Baseline dizziness worsened by movement but present at rest.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 1.5, "vestibular_migraine": 0.8, "menieres": 0.5, "orthostatic": 0.3, "stroke": 1.2 }
+        },
+        {
+          "finding": "Non-positional symptoms",
+          "description": "No relationship between symptoms and head or body position.",
+          "lr": { "bppv": 0.2, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.2, "menieres": 1.2, "orthostatic": 1.5, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "trigger_standing",
+      "type": "history",
+      "question": "Does it happen mainly when standing up?",
+      "description": "Screens for orthostatic etiology by identifying postural symptom onset upon standing.",
+      "cost": 1,
+      "answer": "No, it's there whether I'm lying down, sitting, or standing.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.2, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.2, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Orthostatic symptom onset",
+          "description": "Dizziness provoked by standing, suggesting hemodynamic insufficiency.",
+          "lr": { "bppv": 0.5, "vestibular_neuritis": 0.3, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 5.0, "stroke": 0.5 }
+        },
+        {
+          "finding": "Position-independent symptoms",
+          "description": "Symptoms present regardless of postural changes, against orthostatic etiology.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.2, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.2, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "hearing_loss",
+      "type": "history",
+      "question": "Have you noticed any hearing loss?",
+      "description": "Evaluates cochlear involvement, localizing pathology to the inner ear or cerebellopontine angle.",
+      "cost": 1,
+      "answer": "No, my hearing seems fine.",
+      "lr": { "bppv": 1.2, "vestibular_neuritis": 1.1, "vestibular_migraine": 1.1, "menieres": 0.3, "orthostatic": 1.0, "stroke": 0.9 },
+      "potential_findings": [
+        {
+          "finding": "Subjective hearing loss",
+          "description": "Patient-reported auditory deficit suggesting cochlear or retrocochlear involvement.",
+          "lr": { "bppv": 0.5, "vestibular_neuritis": 0.7, "vestibular_migraine": 0.7, "menieres": 4.0, "orthostatic": 1.0, "stroke": 1.5 }
+        },
+        {
+          "finding": "Hearing preserved",
+          "description": "No subjective auditory complaints; cochlear function likely intact.",
+          "lr": { "bppv": 1.2, "vestibular_neuritis": 1.1, "vestibular_migraine": 1.1, "menieres": 0.3, "orthostatic": 1.0, "stroke": 0.9 }
+        }
+      ]
+    },
+    {
+      "id": "tinnitus",
+      "type": "history",
+      "question": "Do you have ringing in your ears?",
+      "description": "Assesses for cochlear irritation, a hallmark of endolymphatic or inner ear pathology.",
+      "cost": 1,
+      "answer": "No ringing or buzzing.",
+      "lr": { "bppv": 1.1, "vestibular_neuritis": 1.1, "vestibular_migraine": 0.9, "menieres": 0.3, "orthostatic": 1.0, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Tinnitus present",
+          "description": "Subjective auditory perception without external stimulus; suggests cochlear involvement.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 0.8, "vestibular_migraine": 1.2, "menieres": 4.0, "orthostatic": 1.0, "stroke": 1.0 }
+        },
+        {
+          "finding": "No tinnitus",
+          "description": "Absence of abnormal auditory percepts; argues against endolymphatic hydrops.",
+          "lr": { "bppv": 1.1, "vestibular_neuritis": 1.1, "vestibular_migraine": 0.9, "menieres": 0.3, "orthostatic": 1.0, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "ear_fullness",
+      "type": "history",
+      "question": "Do you feel pressure or fullness in your ear?",
+      "description": "Screens for aural fullness, a cardinal symptom of endolymphatic hydrops.",
+      "cost": 1,
+      "answer": "No, nothing like that.",
+      "lr": { "bppv": 1.1, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 0.3, "orthostatic": 1.0, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Aural fullness present",
+          "description": "Sensation of pressure in the ear, characteristic of endolymphatic hydrops.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 0.8, "vestibular_migraine": 1.0, "menieres": 4.5, "orthostatic": 1.0, "stroke": 1.0 }
+        },
+        {
+          "finding": "No aural fullness",
+          "description": "Absence of aural pressure; reduces likelihood of Meniere's disease.",
+          "lr": { "bppv": 1.1, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 0.3, "orthostatic": 1.0, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "migraine_history",
+      "type": "history",
+      "question": "Do you have a history of migraines?",
+      "description": "Establishes migraine diathesis, the primary diagnostic criterion for vestibular migraine.",
+      "cost": 1,
+      "answer": "No, I've never really had bad headaches.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 0.3, "menieres": 0.9, "orthostatic": 1.0, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Positive migraine history",
+          "description": "Established migraine diagnosis fulfills key criterion for vestibular migraine.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 4.0, "menieres": 1.2, "orthostatic": 1.0, "stroke": 1.0 }
+        },
+        {
+          "finding": "No migraine history",
+          "description": "Absence of migrainous phenotype makes vestibular migraine less likely.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 0.3, "menieres": 0.9, "orthostatic": 1.0, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "photophobia",
+      "type": "history",
+      "question": "Are you sensitive to light during these episodes?",
+      "description": "Identifies migrainous features accompanying vestibular symptoms.",
+      "cost": 1,
+      "answer": "Not particularly, no.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 0.4, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Photophobia present",
+          "description": "Light sensitivity during episodes supports migrainous vestibular pathology.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 3.5, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 }
+        },
+        {
+          "finding": "No photophobia",
+          "description": "Absence of light sensitivity argues against migrainous etiology.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 0.4, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "recent_viral",
+      "type": "history",
+      "question": "Did you have a cold or flu recently?",
+      "description": "Screens for preceding viral illness, the typical trigger for post-infectious vestibular neuritis.",
+      "cost": 1,
+      "answer": "Actually yes, I had a bad cold about two weeks ago.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 3.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Preceding viral illness",
+          "description": "Recent upper respiratory infection consistent with post-infectious vestibular neuritis.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 3.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 }
+        },
+        {
+          "finding": "No recent illness",
+          "description": "Absence of viral prodrome; does not exclude but reduces suspicion for neuritis.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 0.5, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "vascular_risk",
+      "type": "history",
+      "question": "Do you have high blood pressure, diabetes, or heart problems?",
+      "description": "Assesses cerebrovascular risk factors relevant to posterior circulation stroke.",
+      "cost": 1,
+      "answer": "I have mild high blood pressure, controlled with medication.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 0.9, "menieres": 1.0, "orthostatic": 1.3, "stroke": 1.8 },
+      "potential_findings": [
+        {
+          "finding": "Vascular risk factors present",
+          "description": "Hypertension, diabetes, or cardiac disease raises pre-test probability of stroke.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 0.9, "menieres": 1.0, "orthostatic": 1.3, "stroke": 1.8 }
+        },
+        {
+          "finding": "No vascular risk factors",
+          "description": "Low cerebrovascular risk profile reduces but does not exclude stroke.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.1, "menieres": 1.0, "orthostatic": 0.7, "stroke": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "nausea",
+      "type": "history",
+      "question": "Have you had nausea or vomiting?",
+      "description": "Evaluates autonomic symptoms accompanying acute vestibular dysfunction.",
+      "cost": 1,
+      "answer": "Yes, I felt very nauseous the first two days, vomited a few times.",
+      "lr": { "bppv": 1.5, "vestibular_neuritis": 2.5, "vestibular_migraine": 2.0, "menieres": 2.0, "orthostatic": 0.5, "stroke": 2.0 },
+      "potential_findings": [
+        {
+          "finding": "Prominent nausea and emesis",
+          "description": "Significant autonomic response indicating acute vestibular asymmetry.",
+          "lr": { "bppv": 1.5, "vestibular_neuritis": 2.5, "vestibular_migraine": 2.0, "menieres": 2.0, "orthostatic": 0.5, "stroke": 2.0 }
+        },
+        {
+          "finding": "No autonomic symptoms",
+          "description": "Absence of nausea or vomiting; less typical of acute vestibular pathology.",
+          "lr": { "bppv": 0.7, "vestibular_neuritis": 0.4, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 1.5, "stroke": 0.7 }
+        }
+      ]
+    },
+    {
+      "id": "focal_neuro",
+      "type": "history",
+      "question": "Any weakness, numbness, or trouble speaking?",
+      "description": "Screens for focal neurological deficits indicating central nervous system pathology.",
+      "cost": 1,
+      "answer": "No, nothing like that.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.4 },
+      "potential_findings": [
+        {
+          "finding": "Focal neurological deficits",
+          "description": "Motor, sensory, or speech deficits strongly suggest central lesion.",
+          "lr": { "bppv": 0.1, "vestibular_neuritis": 0.2, "vestibular_migraine": 0.5, "menieres": 0.2, "orthostatic": 0.3, "stroke": 5.0 }
+        },
+        {
+          "finding": "No focal deficits",
+          "description": "Absence of lateralizing signs; reduces but does not exclude central pathology.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.4 }
+        }
+      ]
+    },
+    {
+      "id": "diplopia",
+      "type": "history",
+      "question": "Have you had any double vision?",
+      "description": "Assesses for brainstem or cranial nerve involvement suggesting central pathology.",
+      "cost": 1,
+      "answer": "No, my vision is fine, just feels weird when things are spinning.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Diplopia present",
+          "description": "Binocular double vision implicates brainstem or cranial nerve pathology.",
+          "lr": { "bppv": 0.3, "vestibular_neuritis": 0.3, "vestibular_migraine": 1.0, "menieres": 0.3, "orthostatic": 0.5, "stroke": 4.0 }
+        },
+        {
+          "finding": "No diplopia",
+          "description": "Normal binocular vision; no evidence of oculomotor pathway involvement.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "head_impulse",
+      "type": "exam",
+      "question": "Perform Head Impulse Test",
+      "description": "Tests vestibulo-ocular reflex gain. Abnormal result indicates peripheral vestibular hypofunction; normal result in acute vertigo is a red flag for central pathology.",
+      "cost": 1,
+      "answer": "Abnormal: catch-up saccade seen when head turned to the left, indicating left vestibular hypofunction.",
+      "lr": { "bppv": 0.8, "vestibular_neuritis": 5.0, "vestibular_migraine": 0.7, "menieres": 2.0, "orthostatic": 1.0, "stroke": 0.1 },
+      "potential_findings": [
+        {
+          "finding": "Abnormal HIT (corrective saccade)",
+          "description": "Catch-up saccade indicates ipsilateral peripheral vestibular hypofunction.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 5.0, "vestibular_migraine": 0.7, "menieres": 2.0, "orthostatic": 1.0, "stroke": 0.1 }
+        },
+        {
+          "finding": "Normal HIT (intact VOR)",
+          "description": "Normal vestibulo-ocular reflex in acute vertigo raises concern for central etiology.",
+          "lr": { "bppv": 1.2, "vestibular_neuritis": 0.2, "vestibular_migraine": 1.3, "menieres": 0.5, "orthostatic": 1.0, "stroke": 5.0 }
+        }
+      ]
+    },
+    {
+      "id": "nystagmus",
+      "type": "exam",
+      "question": "Assess for nystagmus",
+      "description": "Characterizes involuntary eye movements. Direction-fixed horizontal nystagmus suggests peripheral lesion; direction-changing or vertical patterns suggest central pathology.",
+      "cost": 2,
+      "answer": "Horizontal nystagmus beating to the right, direction-fixed in all gaze positions. Increases with gaze toward the right.",
+      "lr": { "bppv": 0.8, "vestibular_neuritis": 4.0, "vestibular_migraine": 1.0, "menieres": 2.5, "orthostatic": 1.0, "stroke": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Direction-fixed horizontal nystagmus",
+          "description": "Unidirectional nystagmus obeying Alexander's law; peripheral vestibular pattern.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 4.0, "vestibular_migraine": 1.0, "menieres": 2.5, "orthostatic": 1.0, "stroke": 0.5 }
+        },
+        {
+          "finding": "Direction-changing or vertical nystagmus",
+          "description": "Gaze-evoked direction changes or vertical beating indicate central oculomotor pathology.",
+          "lr": { "bppv": 0.5, "vestibular_neuritis": 0.2, "vestibular_migraine": 0.8, "menieres": 0.5, "orthostatic": 1.0, "stroke": 5.0 }
+        },
+        {
+          "finding": "No nystagmus observed",
+          "description": "Absence of spontaneous nystagmus; atypical for acute vestibular syndrome.",
+          "lr": { "bppv": 1.2, "vestibular_neuritis": 0.3, "vestibular_migraine": 1.0, "menieres": 0.5, "orthostatic": 1.0, "stroke": 0.8 }
+        }
+      ]
+    },
+    {
+      "id": "skew",
+      "type": "exam",
+      "question": "Perform Test of Skew (alternate cover test)",
+      "description": "Detects vertical ocular misalignment from otolithic pathway disruption, a marker of brainstem pathology.",
+      "cost": 1,
+      "answer": "Negative: no vertical refixation movement when alternating cover between eyes.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.1, "vestibular_migraine": 1.0, "menieres": 1.1, "orthostatic": 1.0, "stroke": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Positive skew deviation",
+          "description": "Vertical refixation on alternate cover test indicates brainstem otolithic pathway lesion.",
+          "lr": { "bppv": 0.3, "vestibular_neuritis": 0.3, "vestibular_migraine": 0.5, "menieres": 0.3, "orthostatic": 1.0, "stroke": 5.0 }
+        },
+        {
+          "finding": "No skew deviation",
+          "description": "Negative alternate cover test; no vertical misalignment detected.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.1, "vestibular_migraine": 1.0, "menieres": 1.1, "orthostatic": 1.0, "stroke": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "dix_hallpike",
+      "type": "exam",
+      "question": "Perform Dix-Hallpike maneuver",
+      "description": "Provokes positional nystagmus diagnostic of posterior canal BPPV. Gold standard for canalithiasis.",
+      "cost": 5,
+      "answer": "Negative: no nystagmus provoked in either direction, though patient reports feeling slightly worse with position change.",
+      "lr": { "bppv": 0.3, "vestibular_neuritis": 1.2, "vestibular_migraine": 1.1, "menieres": 1.2, "orthostatic": 1.0, "stroke": 1.1 },
+      "potential_findings": [
+        {
+          "finding": "Positive (upbeating torsional nystagmus)",
+          "description": "Transient geotropic nystagmus with latency, pathognomonic for posterior canal BPPV.",
+          "lr": { "bppv": 5.0, "vestibular_neuritis": 0.3, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 1.0, "stroke": 0.3 }
+        },
+        {
+          "finding": "Negative Dix-Hallpike",
+          "description": "No provoked nystagmus; argues strongly against posterior canal BPPV.",
+          "lr": { "bppv": 0.3, "vestibular_neuritis": 1.2, "vestibular_migraine": 1.1, "menieres": 1.2, "orthostatic": 1.0, "stroke": 1.1 }
+        }
+      ]
+    },
+    {
+      "id": "orthostatic_bp",
+      "type": "exam",
+      "question": "Check orthostatic blood pressure",
+      "description": "Measures blood pressure change from supine to standing. A drop >20 mmHg systolic confirms orthostatic hypotension.",
+      "cost": 10,
+      "answer": "BP lying: 138/82 mmHg, HR 68. BP standing at 1 min: 134/80 mmHg, HR 74. BP standing at 3 min: 136/82 mmHg, HR 72. No significant orthostatic drop.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.1, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Orthostatic hypotension confirmed",
+          "description": "Systolic drop >20 mmHg or diastolic >10 mmHg upon standing.",
+          "lr": { "bppv": 0.5, "vestibular_neuritis": 0.5, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 5.0, "stroke": 0.5 }
+        },
+        {
+          "finding": "No orthostatic drop",
+          "description": "Stable hemodynamics with postural change; rules out orthostatic etiology.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.1, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "gait",
+      "type": "exam",
+      "question": "Assess gait and balance",
+      "description": "Evaluates vestibular and cerebellar function through ambulation and Romberg testing.",
+      "cost": 3,
+      "answer": "Unsteady gait with tendency to veer to the left. Unable to walk tandem. Romberg positive with eyes closed, falling toward the left.",
+      "lr": { "bppv": 0.8, "vestibular_neuritis": 2.5, "vestibular_migraine": 1.2, "menieres": 1.5, "orthostatic": 1.0, "stroke": 2.0 },
+      "potential_findings": [
+        {
+          "finding": "Lateropulsion",
+          "description": "Unidirectional gait deviation with positive Romberg; suggests unilateral vestibular loss.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 2.5, "vestibular_migraine": 1.2, "menieres": 1.5, "orthostatic": 1.0, "stroke": 2.0 }
+        },
+        {
+          "finding": "Severe truncal ataxia",
+          "description": "Unable to sit or stand unsupported; disproportionate to vertigo, concerning for cerebellar stroke.",
+          "lr": { "bppv": 0.3, "vestibular_neuritis": 0.5, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 0.5, "stroke": 5.0 }
+        },
+        {
+          "finding": "Normal gait and balance",
+          "description": "Stable ambulation and negative Romberg; no gross vestibular or cerebellar deficit.",
+          "lr": { "bppv": 1.2, "vestibular_neuritis": 0.5, "vestibular_migraine": 1.0, "menieres": 0.8, "orthostatic": 1.0, "stroke": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "finger_nose",
+      "type": "exam",
+      "question": "Perform finger-to-nose test",
+      "description": "Tests cerebellar limb coordination. Dysmetria indicates ipsilateral cerebellar hemisphere pathology.",
+      "cost": 1,
+      "answer": "Normal: no dysmetria. Movements are smooth and accurate bilaterally.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.6 },
+      "potential_findings": [
+        {
+          "finding": "Dysmetria present",
+          "description": "Past-pointing on targeted movement indicates cerebellar hemisphere dysfunction.",
+          "lr": { "bppv": 0.3, "vestibular_neuritis": 0.3, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 1.0, "stroke": 4.0 }
+        },
+        {
+          "finding": "No dysmetria",
+          "description": "Accurate limb coordination; no cerebellar hemisphere involvement.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.6 }
+        }
+      ]
+    },
+    {
+      "id": "heel_shin",
+      "type": "exam",
+      "question": "Perform heel-to-shin test",
+      "description": "Assesses lower extremity cerebellar coordination. Ataxia suggests cerebellar or posterior fossa pathology.",
+      "cost": 1,
+      "answer": "Normal: smooth movements without ataxia bilaterally.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.6 },
+      "potential_findings": [
+        {
+          "finding": "Limb ataxia",
+          "description": "Irregular, overshooting movements suggesting ipsilateral cerebellar pathology.",
+          "lr": { "bppv": 0.3, "vestibular_neuritis": 0.3, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 1.0, "stroke": 4.0 }
+        },
+        {
+          "finding": "Normal coordination",
+          "description": "Smooth, accurate heel-to-shin movements; no cerebellar deficit.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.6 }
+        }
+      ]
+    },
+    {
+      "id": "cranial_nerves",
+      "type": "exam",
+      "question": "Examine cranial nerves",
+      "description": "Comprehensive assessment of CN II-XII to detect brainstem or skull base pathology.",
+      "cost": 5,
+      "answer": "Cranial nerves II-XII intact. Pupils equal and reactive. Facial sensation and strength symmetric. Hearing grossly intact to finger rub bilaterally.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 0.8, "orthostatic": 1.0, "stroke": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Cranial nerve deficit",
+          "description": "Facial weakness, gaze palsy, or other CN abnormality localizing to brainstem.",
+          "lr": { "bppv": 0.2, "vestibular_neuritis": 0.3, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 1.0, "stroke": 5.0 }
+        },
+        {
+          "finding": "All cranial nerves intact",
+          "description": "No focal CN deficits; reduces suspicion for structural brainstem lesion.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 0.8, "orthostatic": 1.0, "stroke": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "audiometry",
+      "type": "test",
+      "question": "Order audiometry",
+      "description": "Quantitative pure-tone and speech audiometry. Low-frequency sensorineural loss is characteristic of endolymphatic hydrops.",
+      "cost": 30,
+      "answer": "Pure tone audiometry shows normal hearing thresholds bilaterally (all frequencies \u226425 dB). Speech discrimination scores excellent bilaterally.",
+      "lr": { "bppv": 1.2, "vestibular_neuritis": 1.1, "vestibular_migraine": 1.1, "menieres": 0.2, "orthostatic": 1.0, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Low-frequency sensorineural hearing loss",
+          "description": "Characteristic audiometric pattern of endolymphatic hydrops (Meniere's disease).",
+          "lr": { "bppv": 0.5, "vestibular_neuritis": 0.7, "vestibular_migraine": 0.8, "menieres": 5.0, "orthostatic": 1.0, "stroke": 1.2 }
+        },
+        {
+          "finding": "Normal audiogram",
+          "description": "Normal thresholds bilaterally; argues against cochlear involvement.",
+          "lr": { "bppv": 1.2, "vestibular_neuritis": 1.1, "vestibular_migraine": 1.1, "menieres": 0.2, "orthostatic": 1.0, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "mri",
+      "type": "test",
+      "question": "Order MRI Brain with DWI",
+      "description": "Diffusion-weighted MRI is the gold standard for acute ischemic stroke detection in the posterior fossa.",
+      "cost": 60,
+      "answer": "No acute infarct on diffusion-weighted imaging. No mass lesion. No enhancement of vestibular nerve. Mild periventricular white matter changes, age-appropriate.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.15 },
+      "potential_findings": [
+        {
+          "finding": "Acute posterior circulation infarct",
+          "description": "DWI restriction in cerebellum or brainstem confirms ischemic stroke.",
+          "lr": { "bppv": 0.1, "vestibular_neuritis": 0.1, "vestibular_migraine": 0.1, "menieres": 0.1, "orthostatic": 0.1, "stroke": 5.0 }
+        },
+        {
+          "finding": "No acute intracranial pathology",
+          "description": "Normal DWI and FLAIR; substantially reduces probability of acute stroke.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.15 }
+        }
+      ]
+    },
+    {
+      "id": "ct_head",
+      "type": "test",
+      "question": "Order CT Head",
+      "description": "Non-contrast CT primarily rules out hemorrhage. Limited sensitivity for posterior fossa ischemia.",
+      "cost": 20,
+      "answer": "No acute intracranial hemorrhage. No mass effect. No hydrocephalus. Mild age-related atrophy.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.7 },
+      "potential_findings": [
+        {
+          "finding": "Intracranial hemorrhage or mass",
+          "description": "Acute hemorrhage, mass effect, or structural lesion identified on CT.",
+          "lr": { "bppv": 0.1, "vestibular_neuritis": 0.1, "vestibular_migraine": 0.1, "menieres": 0.1, "orthostatic": 0.1, "stroke": 5.0 }
+        },
+        {
+          "finding": "Normal non-contrast CT",
+          "description": "No hemorrhage or mass; does not exclude posterior fossa ischemic stroke.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 0.7 }
+        }
+      ]
+    },
+    {
+      "id": "ecg",
+      "type": "test",
+      "question": "Order ECG",
+      "description": "Screens for cardiac arrhythmias, particularly atrial fibrillation as a cardioembolic source.",
+      "cost": 10,
+      "answer": "Normal sinus rhythm, rate 72 bpm. Normal axis. No ST-T changes. No arrhythmia.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.9, "stroke": 0.8 },
+      "potential_findings": [
+        {
+          "finding": "Arrhythmia detected",
+          "description": "Atrial fibrillation or other arrhythmia identified; potential cardioembolic source.",
+          "lr": { "bppv": 0.5, "vestibular_neuritis": 0.5, "vestibular_migraine": 0.5, "menieres": 0.5, "orthostatic": 2.0, "stroke": 3.0 }
+        },
+        {
+          "finding": "Normal sinus rhythm",
+          "description": "Regular rhythm without arrhythmia; no cardioembolic risk identified on tracing.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.9, "stroke": 0.8 }
+        }
+      ]
+    },
+    {
+      "id": "cbc",
+      "type": "test",
+      "question": "Order Complete Blood Count",
+      "description": "Screens for anemia or infection that may contribute to or exacerbate dizziness.",
+      "cost": 30,
+      "answer": "WBC 7.2, Hgb 13.8, Plt 245. All values within normal limits.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Anemia",
+          "description": "Reduced hemoglobin may cause or exacerbate presyncope and orthostatic symptoms.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 0.8, "vestibular_migraine": 0.8, "menieres": 0.8, "orthostatic": 2.5, "stroke": 1.0 }
+        },
+        {
+          "finding": "Normal hematologic values",
+          "description": "CBC within reference range; no anemia or hematologic abnormality.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 1.0, "stroke": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "bmp",
+      "type": "test",
+      "question": "Order Basic Metabolic Panel",
+      "description": "Evaluates electrolytes and renal function. Electrolyte derangements may cause or exacerbate dizziness.",
+      "cost": 30,
+      "answer": "Na 140, K 4.1, Cl 102, CO2 24, BUN 18, Cr 0.9, Glucose 98. All normal.",
+      "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.9, "stroke": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Electrolyte derangement",
+          "description": "Abnormal sodium, potassium, or glucose may contribute to dizziness or syncope.",
+          "lr": { "bppv": 0.8, "vestibular_neuritis": 0.8, "vestibular_migraine": 0.8, "menieres": 0.8, "orthostatic": 2.5, "stroke": 1.0 }
+        },
+        {
+          "finding": "Normal metabolic panel",
+          "description": "Electrolytes and renal function within reference range.",
+          "lr": { "bppv": 1.0, "vestibular_neuritis": 1.0, "vestibular_migraine": 1.0, "menieres": 1.0, "orthostatic": 0.9, "stroke": 1.0 }
+        }
+      ]
+    }
+  ],
+  "educational_feedback": {
+    "vestibular_neuritis": {
+      "key_findings": [
+        "Continuous vertigo for days (not episodic)",
+        "Recent viral illness preceding symptoms",
+        "Abnormal head impulse test (peripheral pattern)",
+        "Direction-fixed horizontal nystagmus",
+        "No hearing loss (distinguishes from labyrinthitis)",
+        "Negative skew deviation (peripheral pattern)"
+      ],
+      "clinical_pearl": "The HINTS exam (Head Impulse, Nystagmus, Test of Skew) showing abnormal head impulse + direction-fixed nystagmus + no skew indicates a peripheral lesion. This 'benign' HINTS pattern essentially rules out stroke, even more reliably than early MRI."
+    },
+    "stroke": {
+      "would_show": [
+        "Normal head impulse test (central pattern)",
+        "Direction-changing or vertical nystagmus",
+        "Positive skew deviation",
+        "Cerebellar signs (dysmetria, ataxia out of proportion to vertigo)"
+      ],
+      "clinical_pearl": "A normal head impulse test in acute vestibular syndrome is a red flag for stroke\u2014the vestibular pathways are intact but something central is wrong."
+    }
+  }
+}

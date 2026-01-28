@@ -1,0 +1,638 @@
+{
+  "case_id": "headache_001",
+  "title": "Acute Severe Headache",
+  "patient_presentation": {
+    "age": 52,
+    "sex": "male",
+    "chief_complaint": "Sudden severe headache for 3 hours",
+    "initial_description": "A 52-year-old man presents to the emergency department with a sudden, severe headache that started 3 hours ago while exercising at the gym. He rates the pain as 10 out of 10 and says nothing like this has ever happened before."
+  },
+  "true_diagnosis": "sah",
+  "diagnoses": [
+    { "id": "migraine", "name": "Migraine", "prior_probability": 0.25, "color": "#8b5cf6" },
+    { "id": "tension", "name": "Tension-Type Headache", "prior_probability": 0.15, "color": "#3b82f6" },
+    { "id": "sah", "name": "Subarachnoid Hemorrhage", "prior_probability": 0.15, "color": "#ef4444", "critical": { "label": "Life-Threatening", "reason": "Subarachnoid hemorrhage has 50% mortality if untreated. Thunderclap headache requires emergent CT and, if negative, lumbar puncture. The Ottawa SAH Rule (age >=40, neck pain/stiffness, LOC, onset during exertion, thunderclap, limited neck flexion) has 100% sensitivity." } },
+    { "id": "meningitis", "name": "Bacterial Meningitis", "prior_probability": 0.10, "color": "#f59e0b", "critical": { "label": "Life-Threatening", "reason": "Bacterial meningitis carries high mortality without prompt antibiotics. The classic triad (fever, neck stiffness, altered mental status) is present in only 44% of cases, but 95% have at least two of: fever, headache, neck stiffness, altered mental status." } },
+    { "id": "hypertensive", "name": "Hypertensive Emergency", "prior_probability": 0.15, "color": "#ec4899" },
+    { "id": "gca", "name": "Temporal Arteritis (GCA)", "prior_probability": 0.20, "color": "#10b981" }
+  ],
+  "actions": [
+    {
+      "id": "onset_speed",
+      "type": "history",
+      "question": "How quickly did the headache reach its worst?",
+      "description": "Determines headache tempo. Thunderclap onset (peak within seconds) is the hallmark of subarachnoid hemorrhage and other vascular emergencies.",
+      "cost": 1,
+      "answer": "It hit me like a bolt of lightning. One second I was fine, the next I had the worst pain of my life. It peaked within seconds.",
+      "lr": { "migraine": 0.3, "tension": 0.1, "sah": 4.0, "meningitis": 0.5, "hypertensive": 0.5, "gca": 0.2 },
+      "potential_findings": [
+        {
+          "finding": "Thunderclap onset",
+          "description": "Headache reaching maximum intensity within seconds, characteristic of vascular emergencies.",
+          "lr": { "migraine": 0.3, "tension": 0.1, "sah": 4.0, "meningitis": 0.5, "hypertensive": 0.5, "gca": 0.2 }
+        },
+        {
+          "finding": "Gradual onset over hours",
+          "description": "Progressive headache building over minutes to hours, more typical of primary headaches.",
+          "lr": { "migraine": 2.0, "tension": 2.5, "sah": 0.3, "meningitis": 1.5, "hypertensive": 1.5, "gca": 2.0 }
+        }
+      ]
+    },
+    {
+      "id": "activity_onset",
+      "type": "history",
+      "question": "What were you doing when the headache started?",
+      "description": "Identifies exertional triggers. Onset during Valsalva or physical exertion raises suspicion for aneurysmal rupture.",
+      "cost": 1,
+      "answer": "I was doing deadlifts at the gym. It hit right as I was straining on a heavy rep.",
+      "lr": { "migraine": 0.8, "tension": 0.5, "sah": 2.5, "meningitis": 1.0, "hypertensive": 1.5, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Onset during physical exertion",
+          "description": "Headache triggered by strenuous activity or Valsalva maneuver, associated with aneurysmal rupture.",
+          "lr": { "migraine": 0.8, "tension": 0.5, "sah": 2.5, "meningitis": 1.0, "hypertensive": 1.5, "gca": 1.0 }
+        },
+        {
+          "finding": "Onset at rest or during routine activity",
+          "description": "No exertional trigger identified; does not exclude vascular pathology.",
+          "lr": { "migraine": 1.2, "tension": 1.5, "sah": 0.7, "meningitis": 1.0, "hypertensive": 0.8, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "worst_ever",
+      "type": "history",
+      "question": "Is this the worst headache of your life?",
+      "description": "Screens for sentinel headache. A 'worst ever' headache in an adult mandates investigation for subarachnoid hemorrhage.",
+      "cost": 1,
+      "answer": "Absolutely. Nothing has ever come close to this. I thought I was dying.",
+      "lr": { "migraine": 0.8, "tension": 0.2, "sah": 3.0, "meningitis": 1.5, "hypertensive": 1.0, "gca": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Worst headache of life",
+          "description": "Patient identifies this as unprecedentedly severe, a red flag for secondary causes.",
+          "lr": { "migraine": 0.8, "tension": 0.2, "sah": 3.0, "meningitis": 1.5, "hypertensive": 1.0, "gca": 0.5 }
+        },
+        {
+          "finding": "Severe but not unprecedented",
+          "description": "Patient has experienced similar severity before, suggesting a recurrent primary headache.",
+          "lr": { "migraine": 2.5, "tension": 1.5, "sah": 0.3, "meningitis": 0.5, "hypertensive": 0.8, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "neck_symptoms",
+      "type": "history",
+      "question": "Do you have any neck pain or stiffness?",
+      "description": "Assesses for meningismus. Neck stiffness occurs in both subarachnoid hemorrhage (blood irritating meninges) and meningitis.",
+      "cost": 1,
+      "answer": "Yes, my neck is really stiff and painful, especially when I try to look down.",
+      "lr": { "migraine": 0.8, "tension": 1.2, "sah": 2.5, "meningitis": 3.0, "hypertensive": 0.8, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Neck pain and stiffness present",
+          "description": "Meningismus suggesting meningeal irritation from blood or infection.",
+          "lr": { "migraine": 0.8, "tension": 1.2, "sah": 2.5, "meningitis": 3.0, "hypertensive": 0.8, "gca": 1.0 }
+        },
+        {
+          "finding": "No neck symptoms",
+          "description": "Absence of meningismus; reduces likelihood of meningeal pathology.",
+          "lr": { "migraine": 1.2, "tension": 1.0, "sah": 0.5, "meningitis": 0.3, "hypertensive": 1.2, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "vomiting",
+      "type": "history",
+      "question": "Have you vomited?",
+      "description": "Evaluates for associated emesis. Vomiting occurs in SAH, migraine, meningitis, and raised intracranial pressure.",
+      "cost": 1,
+      "answer": "Yes, I vomited three times on the way here.",
+      "lr": { "migraine": 1.8, "tension": 0.3, "sah": 2.0, "meningitis": 2.0, "hypertensive": 1.0, "gca": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Prominent vomiting",
+          "description": "Multiple episodes of emesis accompanying headache onset.",
+          "lr": { "migraine": 1.8, "tension": 0.3, "sah": 2.0, "meningitis": 2.0, "hypertensive": 1.0, "gca": 0.5 }
+        },
+        {
+          "finding": "No nausea or vomiting",
+          "description": "Absence of emesis; less typical of acute intracranial pathology.",
+          "lr": { "migraine": 0.5, "tension": 1.5, "sah": 0.5, "meningitis": 0.5, "hypertensive": 1.0, "gca": 1.2 }
+        }
+      ]
+    },
+    {
+      "id": "photophobia",
+      "type": "history",
+      "question": "Are you bothered by light?",
+      "description": "Assesses photophobia. A key migraine feature (LR+ 5.8 for migraine) but also seen in meningeal irritation from any cause.",
+      "cost": 1,
+      "answer": "Yes, the lights in here are really bothering me.",
+      "lr": { "migraine": 2.5, "tension": 0.5, "sah": 1.5, "meningitis": 2.0, "hypertensive": 0.8, "gca": 0.8 },
+      "potential_findings": [
+        {
+          "finding": "Photophobia present",
+          "description": "Light sensitivity indicating meningeal irritation or migraine pathophysiology.",
+          "lr": { "migraine": 2.5, "tension": 0.5, "sah": 1.5, "meningitis": 2.0, "hypertensive": 0.8, "gca": 0.8 }
+        },
+        {
+          "finding": "No photophobia",
+          "description": "Absence of light sensitivity; argues against migraine and meningeal irritation.",
+          "lr": { "migraine": 0.3, "tension": 1.5, "sah": 0.8, "meningitis": 0.5, "hypertensive": 1.2, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "fever",
+      "type": "history",
+      "question": "Have you had any fever or chills?",
+      "description": "Screens for infectious etiology. Fever is present in 95% of bacterial meningitis; absence substantially reduces its likelihood.",
+      "cost": 1,
+      "answer": "No, I don't feel feverish at all. No chills either.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.1, "meningitis": 0.2, "hypertensive": 1.0, "gca": 0.8 },
+      "potential_findings": [
+        {
+          "finding": "Fever and chills present",
+          "description": "Febrile illness suggesting infectious or inflammatory etiology.",
+          "lr": { "migraine": 0.5, "tension": 0.5, "sah": 0.5, "meningitis": 4.0, "hypertensive": 0.5, "gca": 1.5 }
+        },
+        {
+          "finding": "No fever",
+          "description": "Afebrile state; substantially reduces probability of bacterial meningitis.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.1, "meningitis": 0.2, "hypertensive": 1.0, "gca": 0.8 }
+        }
+      ]
+    },
+    {
+      "id": "migraine_history",
+      "type": "history",
+      "question": "Do you have a history of migraines or recurrent headaches?",
+      "description": "Establishes prior headache pattern. Absence of migraine history in a patient with first severe headache mandates exclusion of secondary causes.",
+      "cost": 1,
+      "answer": "No, I occasionally get a mild headache with stress, but nothing remotely like this.",
+      "lr": { "migraine": 0.3, "tension": 1.2, "sah": 1.2, "meningitis": 1.0, "hypertensive": 1.0, "gca": 1.2 },
+      "potential_findings": [
+        {
+          "finding": "Known migraine sufferer",
+          "description": "Established migraine diagnosis with similar prior episodes.",
+          "lr": { "migraine": 4.0, "tension": 0.5, "sah": 0.5, "meningitis": 1.0, "hypertensive": 1.0, "gca": 0.5 }
+        },
+        {
+          "finding": "No significant headache history",
+          "description": "First presentation of severe headache; raises concern for secondary causes.",
+          "lr": { "migraine": 0.3, "tension": 1.2, "sah": 1.2, "meningitis": 1.0, "hypertensive": 1.0, "gca": 1.2 }
+        }
+      ]
+    },
+    {
+      "id": "loc",
+      "type": "history",
+      "question": "Did you lose consciousness or black out?",
+      "description": "Screens for syncope at headache onset. Transient loss of consciousness occurs in ~50% of aneurysmal SAH from acute intracranial pressure rise.",
+      "cost": 1,
+      "answer": "I think so. My gym partner said I went pale and slumped over for a few seconds before I came to.",
+      "lr": { "migraine": 0.3, "tension": 0.1, "sah": 3.5, "meningitis": 0.5, "hypertensive": 0.5, "gca": 0.2 },
+      "potential_findings": [
+        {
+          "finding": "Witnessed loss of consciousness",
+          "description": "Transient syncope at headache onset from acute intracranial pressure rise.",
+          "lr": { "migraine": 0.3, "tension": 0.1, "sah": 3.5, "meningitis": 0.5, "hypertensive": 0.5, "gca": 0.2 }
+        },
+        {
+          "finding": "No loss of consciousness",
+          "description": "Patient remained alert throughout; does not exclude SAH.",
+          "lr": { "migraine": 1.2, "tension": 1.2, "sah": 0.6, "meningitis": 1.0, "hypertensive": 1.0, "gca": 1.2 }
+        }
+      ]
+    },
+    {
+      "id": "focal_symptoms",
+      "type": "history",
+      "question": "Any weakness, numbness, speech difficulty, or vision changes?",
+      "description": "Screens for focal neurological deficits suggesting structural intracranial pathology or migraine with aura.",
+      "cost": 1,
+      "answer": "No weakness or numbness. My vision seems normal, the light just hurts. Speech is fine.",
+      "lr": { "migraine": 0.8, "tension": 1.0, "sah": 0.8, "meningitis": 0.8, "hypertensive": 0.7, "gca": 0.8 },
+      "potential_findings": [
+        {
+          "finding": "Focal neurological symptoms",
+          "description": "Motor, sensory, visual or speech deficits localizing to a vascular territory.",
+          "lr": { "migraine": 1.5, "tension": 0.2, "sah": 2.5, "meningitis": 2.0, "hypertensive": 3.0, "gca": 1.5 }
+        },
+        {
+          "finding": "No focal symptoms",
+          "description": "Absence of lateralizing signs; does not exclude intracranial pathology.",
+          "lr": { "migraine": 0.8, "tension": 1.0, "sah": 0.8, "meningitis": 0.8, "hypertensive": 0.7, "gca": 0.8 }
+        }
+      ]
+    },
+    {
+      "id": "sick_contacts",
+      "type": "history",
+      "question": "Have you been sick recently? Any contact with ill people?",
+      "description": "Screens for infectious exposure relevant to meningitis. Recent URI or sick contacts raise concern for meningococcal disease.",
+      "cost": 1,
+      "answer": "No, I've been completely healthy. Nobody around me has been sick.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.0, "meningitis": 0.4, "hypertensive": 1.0, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Recent illness or sick contacts",
+          "description": "Infectious prodrome or exposure raising suspicion for meningitis.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.0, "meningitis": 3.0, "hypertensive": 1.0, "gca": 1.0 }
+        },
+        {
+          "finding": "No recent illness or exposures",
+          "description": "No infectious prodrome; reduces but does not exclude meningitis.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.0, "meningitis": 0.4, "hypertensive": 1.0, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "htn_history",
+      "type": "history",
+      "question": "Do you have high blood pressure or take any medications?",
+      "description": "Assesses cardiovascular risk factors. Hypertension is both a risk factor for SAH and the primary cause of hypertensive emergency.",
+      "cost": 1,
+      "answer": "My doctor mentioned my blood pressure was a bit high at my last checkup, but I'm not on any medications for it.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.5, "meningitis": 1.0, "hypertensive": 1.8, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "History of hypertension",
+          "description": "Known elevated blood pressure, a major risk factor for hemorrhagic stroke.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.5, "meningitis": 1.0, "hypertensive": 1.8, "gca": 1.0 }
+        },
+        {
+          "finding": "No hypertension or cardiovascular history",
+          "description": "No vascular risk factors identified.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 0.7, "meningitis": 1.0, "hypertensive": 0.4, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "location",
+      "type": "history",
+      "question": "Where is the headache located?",
+      "description": "Headache topography aids diagnosis. Occipital or diffuse headache favors SAH; unilateral temporal suggests migraine or GCA.",
+      "cost": 1,
+      "answer": "It's all over, but worst at the back of my head and down my neck.",
+      "lr": { "migraine": 0.5, "tension": 0.8, "sah": 2.0, "meningitis": 1.5, "hypertensive": 1.0, "gca": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Occipital and diffuse headache",
+          "description": "Posterior and generalized distribution consistent with meningeal irritation.",
+          "lr": { "migraine": 0.5, "tension": 0.8, "sah": 2.0, "meningitis": 1.5, "hypertensive": 1.0, "gca": 0.5 }
+        },
+        {
+          "finding": "Unilateral temporal headache",
+          "description": "Lateralized pain in the temporal region, classic for migraine or temporal arteritis.",
+          "lr": { "migraine": 2.5, "tension": 0.5, "sah": 0.5, "meningitis": 0.8, "hypertensive": 0.8, "gca": 3.0 }
+        },
+        {
+          "finding": "Bilateral band-like headache",
+          "description": "Pressure-type pain encircling the head, characteristic of tension-type headache.",
+          "lr": { "migraine": 0.3, "tension": 3.0, "sah": 0.3, "meningitis": 0.8, "hypertensive": 1.0, "gca": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "type": "history",
+      "question": "Does the headache throb or is it more of a constant pressure?",
+      "description": "Headache quality differentiates primary headaches. Pulsating quality is a POUND criterion for migraine (LR+ for migraine).",
+      "cost": 1,
+      "answer": "It's a constant, severe pressure. It doesn't throb or pulse.",
+      "lr": { "migraine": 0.4, "tension": 1.5, "sah": 1.2, "meningitis": 1.2, "hypertensive": 1.2, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Pulsating or throbbing quality",
+          "description": "Pulsatile headache meeting a POUND criterion for migraine diagnosis.",
+          "lr": { "migraine": 3.0, "tension": 0.3, "sah": 0.8, "meningitis": 0.8, "hypertensive": 0.8, "gca": 1.0 }
+        },
+        {
+          "finding": "Constant pressure or squeezing",
+          "description": "Non-pulsatile headache; argues against migraine, consistent with tension-type or secondary causes.",
+          "lr": { "migraine": 0.4, "tension": 1.5, "sah": 1.2, "meningitis": 1.2, "hypertensive": 1.2, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "vitals",
+      "type": "exam",
+      "question": "Check vital signs",
+      "description": "Blood pressure, heart rate, temperature, and oxygen saturation. Fever suggests infection; severe hypertension may indicate hypertensive emergency or reactive elevation.",
+      "cost": 2,
+      "answer": "BP 172/98 mmHg, HR 92 bpm, Temp 36.8\u00b0C (98.2\u00b0F), RR 18, SpO2 99%.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.5, "meningitis": 0.3, "hypertensive": 2.0, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Elevated BP, afebrile, tachycardic",
+          "description": "Moderate hypertension without fever. BP elevation may be reactive (pain, SAH) or chronic.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.5, "meningitis": 0.3, "hypertensive": 2.0, "gca": 1.0 }
+        },
+        {
+          "finding": "Febrile with normal BP",
+          "description": "Fever present, suggesting infectious or inflammatory etiology.",
+          "lr": { "migraine": 0.5, "tension": 0.5, "sah": 0.5, "meningitis": 4.0, "hypertensive": 0.3, "gca": 1.5 }
+        },
+        {
+          "finding": "Severely elevated BP (>220/120)",
+          "description": "Hypertensive crisis range with potential for end-organ damage.",
+          "lr": { "migraine": 0.5, "tension": 0.5, "sah": 1.0, "meningitis": 0.5, "hypertensive": 5.0, "gca": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "nuchal_rigidity",
+      "type": "exam",
+      "question": "Assess nuchal rigidity",
+      "description": "Tests for meningismus by passively flexing the neck. Present in 70% of bacterial meningitis and in SAH from blood irritating the meninges.",
+      "cost": 1,
+      "answer": "Marked nuchal rigidity. Patient resists passive neck flexion and reports significant pain with attempted chin-to-chest movement.",
+      "lr": { "migraine": 0.3, "tension": 0.3, "sah": 3.0, "meningitis": 3.5, "hypertensive": 0.5, "gca": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Nuchal rigidity present",
+          "description": "Resistance to passive neck flexion indicating meningeal irritation.",
+          "lr": { "migraine": 0.3, "tension": 0.3, "sah": 3.0, "meningitis": 3.5, "hypertensive": 0.5, "gca": 0.5 }
+        },
+        {
+          "finding": "Supple neck",
+          "description": "No resistance to passive neck flexion; argues against meningeal irritation.",
+          "lr": { "migraine": 1.3, "tension": 1.3, "sah": 0.4, "meningitis": 0.3, "hypertensive": 1.2, "gca": 1.2 }
+        }
+      ]
+    },
+    {
+      "id": "kernig_brudzinski",
+      "type": "exam",
+      "question": "Perform Kernig and Brudzinski signs",
+      "description": "Classical meningeal signs. Sensitivity is only 5-30% but specificity is 95%. Positive signs strongly suggest meningeal irritation.",
+      "cost": 2,
+      "answer": "Brudzinski sign positive: passive neck flexion causes involuntary hip and knee flexion. Kernig sign equivocal bilaterally.",
+      "lr": { "migraine": 0.2, "tension": 0.2, "sah": 2.0, "meningitis": 2.5, "hypertensive": 0.3, "gca": 0.3 },
+      "potential_findings": [
+        {
+          "finding": "Positive meningeal signs",
+          "description": "Brudzinski or Kernig sign present; high specificity (95%) for meningeal pathology.",
+          "lr": { "migraine": 0.2, "tension": 0.2, "sah": 2.0, "meningitis": 2.5, "hypertensive": 0.3, "gca": 0.3 }
+        },
+        {
+          "finding": "Negative meningeal signs",
+          "description": "Both Kernig and Brudzinski negative. Low sensitivity (5-30%) means this does not exclude meningitis or SAH.",
+          "lr": { "migraine": 1.1, "tension": 1.1, "sah": 0.8, "meningitis": 0.8, "hypertensive": 1.1, "gca": 1.1 }
+        }
+      ]
+    },
+    {
+      "id": "neuro_exam",
+      "type": "exam",
+      "question": "Perform full neurological examination",
+      "description": "Comprehensive assessment of cranial nerves, motor, sensory, reflexes, and coordination. Focal findings localize pathology.",
+      "cost": 5,
+      "answer": "Cranial nerves II-XII intact. No motor or sensory deficits. Reflexes symmetric. Coordination normal. No pronator drift.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 0.8, "meningitis": 0.8, "hypertensive": 0.5, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Focal neurological deficits",
+          "description": "Cranial nerve palsy, hemiparesis, or other lateralizing signs localizing to a vascular territory.",
+          "lr": { "migraine": 0.5, "tension": 0.1, "sah": 3.0, "meningitis": 2.5, "hypertensive": 3.5, "gca": 1.5 }
+        },
+        {
+          "finding": "Non-focal neurological exam",
+          "description": "No lateralizing deficits identified; does not exclude intracranial pathology.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 0.8, "meningitis": 0.8, "hypertensive": 0.5, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "mental_status",
+      "type": "exam",
+      "question": "Assess mental status and level of consciousness",
+      "description": "Evaluates for altered sensorium. Altered mental status is a component of the meningitis triad and indicates raised intracranial pressure.",
+      "cost": 1,
+      "answer": "GCS 15. Alert and oriented to person, place, time, and situation. Slightly irritable but coherent and appropriate.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 0.8, "meningitis": 0.4, "hypertensive": 0.8, "gca": 1.0 },
+      "potential_findings": [
+        {
+          "finding": "Altered mental status",
+          "description": "Confusion, drowsiness, or disorientation suggesting raised ICP or encephalopathy.",
+          "lr": { "migraine": 0.2, "tension": 0.1, "sah": 3.0, "meningitis": 4.0, "hypertensive": 3.0, "gca": 0.5 }
+        },
+        {
+          "finding": "Normal mental status",
+          "description": "Alert and fully oriented; reduces likelihood of meningitis and severe SAH.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 0.8, "meningitis": 0.4, "hypertensive": 0.8, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "temporal_arteries",
+      "type": "exam",
+      "question": "Palpate temporal arteries",
+      "description": "Assesses for temporal artery tenderness, beading, prominence, or absent pulse\u2014signs of giant cell arteritis.",
+      "cost": 2,
+      "answer": "Temporal arteries are soft, pulsatile bilaterally, and non-tender. No beading or prominence noted.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.0, "meningitis": 1.0, "hypertensive": 1.0, "gca": 0.3 },
+      "potential_findings": [
+        {
+          "finding": "Temporal artery abnormalities",
+          "description": "Tenderness, beading, prominence, or absent pulse in the temporal arteries (LR+ 2.6-4.6 for GCA).",
+          "lr": { "migraine": 0.3, "tension": 0.3, "sah": 0.5, "meningitis": 0.5, "hypertensive": 0.5, "gca": 4.5 }
+        },
+        {
+          "finding": "Normal temporal arteries",
+          "description": "No tenderness or structural abnormality; absence modestly reduces GCA likelihood (LR- 0.53).",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.0, "meningitis": 1.0, "hypertensive": 1.0, "gca": 0.3 }
+        }
+      ]
+    },
+    {
+      "id": "fundoscopy",
+      "type": "exam",
+      "question": "Perform fundoscopic examination",
+      "description": "Direct ophthalmoscopy evaluates for papilledema (raised ICP), subhyaloid hemorrhage (SAH), or hypertensive retinopathy.",
+      "cost": 3,
+      "answer": "No papilledema. A small subhyaloid hemorrhage is noted in the left eye. No hypertensive retinopathy changes.",
+      "lr": { "migraine": 0.3, "tension": 0.3, "sah": 3.5, "meningitis": 0.5, "hypertensive": 0.5, "gca": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Subhyaloid hemorrhage (Terson syndrome)",
+          "description": "Preretinal hemorrhage from acute intracranial pressure rise; occurs in 20-40% of SAH.",
+          "lr": { "migraine": 0.3, "tension": 0.3, "sah": 3.5, "meningitis": 0.5, "hypertensive": 0.5, "gca": 0.5 }
+        },
+        {
+          "finding": "Papilledema",
+          "description": "Bilateral optic disc swelling indicating raised intracranial pressure.",
+          "lr": { "migraine": 0.3, "tension": 0.3, "sah": 1.5, "meningitis": 2.0, "hypertensive": 3.0, "gca": 0.5 }
+        },
+        {
+          "finding": "Normal fundoscopic exam",
+          "description": "No papilledema, hemorrhage, or vascular changes identified.",
+          "lr": { "migraine": 1.2, "tension": 1.2, "sah": 0.7, "meningitis": 0.8, "hypertensive": 0.4, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "ct_head",
+      "type": "test",
+      "question": "Order CT Head non-contrast",
+      "description": "First-line imaging for acute headache. CT within 6 hours of onset has 98.7% sensitivity for SAH. Identifies hemorrhage, mass, and hydrocephalus.",
+      "cost": 20,
+      "answer": "Hyperdense material in the basal cisterns, sylvian fissures, and interhemispheric fissure consistent with acute subarachnoid hemorrhage. No hydrocephalus. No intraparenchymal hemorrhage.",
+      "lr": { "migraine": 0.05, "tension": 0.05, "sah": 5.0, "meningitis": 0.1, "hypertensive": 0.1, "gca": 0.1 },
+      "potential_findings": [
+        {
+          "finding": "Acute subarachnoid hemorrhage on CT",
+          "description": "Hyperdense blood in the subarachnoid space; essentially diagnostic of SAH.",
+          "lr": { "migraine": 0.05, "tension": 0.05, "sah": 5.0, "meningitis": 0.1, "hypertensive": 0.1, "gca": 0.1 }
+        },
+        {
+          "finding": "Normal CT head",
+          "description": "No hemorrhage or mass. CT sensitivity decreases with time; LP may still be needed if clinical suspicion is high.",
+          "lr": { "migraine": 1.5, "tension": 1.5, "sah": 0.15, "meningitis": 1.0, "hypertensive": 0.8, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "ct_angio",
+      "type": "test",
+      "question": "Order CT Angiography of head and neck",
+      "description": "Identifies aneurysms, arterial dissection, and vascular malformations. Sensitivity >95% for aneurysms >3mm.",
+      "cost": 25,
+      "answer": "5mm saccular aneurysm at the anterior communicating artery with adjacent hemorrhage. No additional aneurysms. No dissection.",
+      "lr": { "migraine": 0.1, "tension": 0.1, "sah": 5.0, "meningitis": 0.1, "hypertensive": 0.1, "gca": 0.1 },
+      "potential_findings": [
+        {
+          "finding": "Cerebral aneurysm identified",
+          "description": "Saccular aneurysm at a typical location with surrounding hemorrhage; confirms aneurysmal SAH.",
+          "lr": { "migraine": 0.1, "tension": 0.1, "sah": 5.0, "meningitis": 0.1, "hypertensive": 0.1, "gca": 0.1 }
+        },
+        {
+          "finding": "Normal cerebral vasculature",
+          "description": "No aneurysm, dissection, or vascular malformation identified.",
+          "lr": { "migraine": 1.5, "tension": 1.5, "sah": 0.3, "meningitis": 1.0, "hypertensive": 1.0, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "lumbar_puncture",
+      "type": "test",
+      "question": "Perform lumbar puncture",
+      "description": "Measures opening pressure and CSF composition. Required if CT is negative but SAH suspicion remains. Xanthochromia confirms SAH; pleocytosis suggests meningitis.",
+      "cost": 30,
+      "answer": "Opening pressure elevated at 28 cm H2O. CSF appears xanthochromic. RBC 12,500 (non-diminishing in sequential tubes). WBC 18. Protein mildly elevated. Glucose normal. Gram stain negative.",
+      "lr": { "migraine": 0.1, "tension": 0.1, "sah": 5.0, "meningitis": 0.3, "hypertensive": 0.1, "gca": 0.1 },
+      "potential_findings": [
+        {
+          "finding": "Xanthochromia with elevated RBCs",
+          "description": "Yellow discoloration of CSF with non-diminishing red cells across tubes; confirms subarachnoid blood.",
+          "lr": { "migraine": 0.1, "tension": 0.1, "sah": 5.0, "meningitis": 0.3, "hypertensive": 0.1, "gca": 0.1 }
+        },
+        {
+          "finding": "Inflammatory CSF profile",
+          "description": "Elevated WBC with neutrophil predominance, low glucose, elevated protein consistent with bacterial meningitis.",
+          "lr": { "migraine": 0.1, "tension": 0.1, "sah": 0.3, "meningitis": 5.0, "hypertensive": 0.1, "gca": 0.1 }
+        },
+        {
+          "finding": "Normal CSF",
+          "description": "Normal opening pressure, clear CSF, no cells, normal chemistry.",
+          "lr": { "migraine": 1.5, "tension": 1.5, "sah": 0.1, "meningitis": 0.1, "hypertensive": 1.0, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "ecg",
+      "type": "test",
+      "question": "Order ECG",
+      "description": "Screens for cardiac arrhythmias and neurogenic cardiac changes. SAH can cause diffuse T-wave inversions and QTc prolongation.",
+      "cost": 10,
+      "answer": "Sinus tachycardia at 94 bpm. Diffuse deep T-wave inversions across precordial leads. QTc prolonged at 480ms. No ST elevation.",
+      "lr": { "migraine": 0.3, "tension": 0.3, "sah": 3.0, "meningitis": 0.5, "hypertensive": 1.0, "gca": 0.5 },
+      "potential_findings": [
+        {
+          "finding": "Neurogenic ECG changes",
+          "description": "Diffuse T-wave inversions and QTc prolongation; classic neurogenic cardiac changes seen in SAH.",
+          "lr": { "migraine": 0.3, "tension": 0.3, "sah": 3.0, "meningitis": 0.5, "hypertensive": 1.0, "gca": 0.5 }
+        },
+        {
+          "finding": "Normal ECG",
+          "description": "Normal sinus rhythm without ST-T changes or conduction abnormalities.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 0.7, "meningitis": 1.0, "hypertensive": 0.8, "gca": 1.0 }
+        }
+      ]
+    },
+    {
+      "id": "blood_tests",
+      "type": "test",
+      "question": "Order CBC and Basic Metabolic Panel",
+      "description": "Baseline labs. Leukocytosis may indicate infection or stress response. Electrolyte derangements can cause headache.",
+      "cost": 30,
+      "answer": "WBC 11.8 (mildly elevated), Hgb 14.5, Plt 220. Na 139, K 4.0, Cr 1.0, Glucose 142 (mildly elevated). Coagulation studies normal.",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.2, "meningitis": 0.8, "hypertensive": 1.0, "gca": 0.8 },
+      "potential_findings": [
+        {
+          "finding": "Mild leukocytosis and stress hyperglycemia",
+          "description": "Non-specific stress response; mild WBC elevation does not distinguish between causes.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.2, "meningitis": 0.8, "hypertensive": 1.0, "gca": 0.8 }
+        },
+        {
+          "finding": "Marked leukocytosis",
+          "description": "WBC >15,000 suggesting significant infectious or inflammatory process.",
+          "lr": { "migraine": 0.5, "tension": 0.5, "sah": 0.8, "meningitis": 3.0, "hypertensive": 0.5, "gca": 1.5 }
+        },
+        {
+          "finding": "Normal labs",
+          "description": "All values within reference ranges.",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 0.8, "meningitis": 0.5, "hypertensive": 1.0, "gca": 0.8 }
+        }
+      ]
+    },
+    {
+      "id": "esr_crp",
+      "type": "test",
+      "question": "Order ESR and CRP",
+      "description": "Inflammatory markers. ESR >50 has sensitivity of 87% for GCA (negative LR 0.27). Normal values substantially reduce GCA probability.",
+      "cost": 30,
+      "answer": "ESR 12 mm/hr (normal, reference <20). CRP 0.4 mg/dL (normal, reference <1.0).",
+      "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.0, "meningitis": 0.5, "hypertensive": 1.0, "gca": 0.15 },
+      "potential_findings": [
+        {
+          "finding": "Markedly elevated ESR and CRP",
+          "description": "ESR >50 and elevated CRP strongly suggestive of inflammatory vasculitis (GCA LR+ 3.1 for ESR >100).",
+          "lr": { "migraine": 0.5, "tension": 0.5, "sah": 0.5, "meningitis": 2.0, "hypertensive": 0.5, "gca": 5.0 }
+        },
+        {
+          "finding": "Normal inflammatory markers",
+          "description": "Normal ESR and CRP substantially reduce probability of GCA (negative LR 0.2-0.27).",
+          "lr": { "migraine": 1.0, "tension": 1.0, "sah": 1.0, "meningitis": 0.5, "hypertensive": 1.0, "gca": 0.15 }
+        }
+      ]
+    }
+  ],
+  "educational_feedback": {
+    "sah": {
+      "key_findings": [
+        "Thunderclap headache (peak within seconds)",
+        "Worst headache of life in a patient without migraine history",
+        "Onset during physical exertion (Valsalva)",
+        "Transient loss of consciousness at onset",
+        "Nuchal rigidity and positive Brudzinski sign",
+        "Subhyaloid hemorrhage on fundoscopy (Terson syndrome)",
+        "CT showing subarachnoid blood in basal cisterns",
+        "Neurogenic ECG changes (T-wave inversions, prolonged QTc)"
+      ],
+      "clinical_pearl": "The Ottawa SAH Rule (age >=40, neck pain/stiffness, witnessed LOC, onset during exertion, thunderclap onset, limited neck flexion) has 100% sensitivity for SAH. CT within 6 hours has 98.7% sensitivity; if negative, lumbar puncture with xanthochromia testing is required. Never dismiss a first or worst headache as migraine without excluding SAH."
+    },
+    "meningitis": {
+      "would_show": [
+        "Fever (present in 95%)",
+        "Altered mental status",
+        "Inflammatory CSF (elevated WBC, low glucose, elevated protein)",
+        "Positive gram stain or cultures",
+        "Petechial rash (meningococcal)"
+      ],
+      "clinical_pearl": "The classic triad of fever, neck stiffness, and altered mental status is present in only 44% of bacterial meningitis cases, but 95% have at least two of: fever, headache, neck stiffness, and altered mental status. The absence of all three effectively rules out meningitis."
+    }
+  }
+}
