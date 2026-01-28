@@ -1,13 +1,15 @@
 # Diagnostic Reasoning Game
 
-An educational game teaching clinical diagnostic reasoning through Bayesian probability updates. Players work through a patient case by asking history questions, performing physical exams, and ordering tests to narrow down the differential diagnosis.
+An educational game teaching clinical diagnostic reasoning through Bayesian probability updates. Players work through patient cases by asking history questions, performing physical exams, and ordering tests to narrow down the differential diagnosis.
 
 ## Features
 
 - **Bayesian probability engine**: Each finding updates all diagnosis probabilities using likelihood ratios
-- **Cost-aware gameplay**: History is free, exams are cheap, tests are expensive—encouraging efficient clinical reasoning
-- **Real clinical data**: Likelihood ratios derived from published medical literature
+- **Time-based cost system**: History is quick (1 min), exams are moderate (1-10 min), tests are slow (10-60 min) -- encouraging efficient clinical reasoning
+- **Real clinical data**: Likelihood ratios derived from published medical literature (JAMA Rational Clinical Examination, Ottawa SAH Rule, POUND mnemonic)
+- **Critical diagnosis alerts**: Life-threatening conditions are flagged so they aren't missed
 - **Educational feedback**: Clinical pearls and key teaching points after each case
+- **Multiple cases**: Dizziness and acute headache cases with more to come
 
 ## Quick Start
 
@@ -22,19 +24,31 @@ npm run dev
 npm run build
 ```
 
+## Deployment
+
+The project is configured for GitHub Pages deployment via GitHub Actions. Every push to `main` triggers an automatic build and deploy.
+
+Live at: `https://<username>.github.io/diagnostic-game/`
+
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── DiagnosticGame.jsx   # Main game controller
-│   ├── ChatHistory.jsx      # Left panel: question/answer history
-│   ├── ActionPanel.jsx      # Left panel: action selection tabs
-│   └── DiagnosisPanel.jsx   # Right panel: probability bars & scoring
+│   ├── TitleScreen.jsx        # Title screen with instructions and case selection
+│   ├── DiagnosticGame.jsx     # Main game controller
+│   ├── ChatHistory.jsx        # Left panel: question/answer history
+│   ├── ActionPanel.jsx        # Left panel: action selection tabs
+│   ├── DiagnosisPanel.jsx     # Right panel: probability bars
+│   ├── ActionTooltip.jsx      # Tooltip for potential findings
+│   └── DiagnosisTooltip.jsx   # Tooltip for diagnosis evidence summary
 ├── data/
 │   └── cases/
-│       └── dizziness_001.json  # Case data with LRs
-├── App.jsx
+│       ├── dizziness_001.json
+│       └── headache_001.json
+├── utils/
+│   └── lrHelpers.js           # Likelihood ratio display helpers
+├── App.jsx                    # Screen manager (title / game)
 ├── main.jsx
 └── index.css
 ```
@@ -45,7 +59,7 @@ src/
 
 Each action (question, exam, test) has likelihood ratios (LRs) for each diagnosis:
 - LR > 1: Finding makes diagnosis more likely
-- LR < 1: Finding makes diagnosis less likely  
+- LR < 1: Finding makes diagnosis less likely
 - LR = 1: Finding doesn't change probability
 
 The probability update follows Bayes' theorem:
@@ -55,23 +69,29 @@ posterior_odds = prior_odds × likelihood_ratio
 
 Probabilities are then normalized to sum to 1.
 
-### Scoring
+### Strategy
 
-- Correct diagnosis: +100 points
-- Incorrect diagnosis: -50 points
-- Total cost of tests/exams: subtracted from score
-- **Goal**: Maximize score by reaching correct diagnosis with minimal testing
+1. **Start with history questions** (1 min each) -- these often provide strong signal
+2. **Use physical exam strategically** -- fast and often diagnostic
+3. **Order expensive tests only when needed** -- imaging and labs are slow
+4. **Watch for critical diagnoses** -- life-threatening conditions must not be missed
+5. **Aim for high confidence** before committing to a final diagnosis
 
-### Winning Strategy
+## Clinical Cases
 
-1. **Start with free history questions** - these often provide strong signal
-2. **Use physical exam strategically** - cheap and often diagnostic
-3. **Order expensive tests only when needed** - MRI costs $100!
-4. **Aim for ≥90% confidence** before diagnosing
+### Dizziness (dizziness_001)
+- **Patient**: 58-year-old female with acute dizziness
+- **Differential**: BPPV, Vestibular Neuritis, Vestibular Migraine, Meniere's Disease, Orthostatic Hypotension, Posterior Stroke
+- **Teaching points**: TiTrATE approach, HINTS exam, red flags for central causes
+
+### Acute Headache (headache_001)
+- **Patient**: 52-year-old male with sudden severe headache during exercise
+- **Differential**: Migraine, Tension-Type Headache, Subarachnoid Hemorrhage, Bacterial Meningitis, Hypertensive Emergency, Temporal Arteritis (GCA)
+- **Teaching points**: Ottawa SAH Rule, CT-LP pathway, thunderclap headache workup, meningeal signs
 
 ## Adding New Cases
 
-Create a new JSON file in `src/data/cases/` following this structure:
+Create a new JSON file in `src/data/cases/` and add it to the `CASES` array in `App.jsx`:
 
 ```json
 {
@@ -79,7 +99,7 @@ Create a new JSON file in `src/data/cases/` following this structure:
   "title": "Case Title",
   "patient_presentation": {
     "age": 58,
-    "sex": "female", 
+    "sex": "female",
     "chief_complaint": "...",
     "initial_description": "..."
   },
@@ -89,7 +109,8 @@ Create a new JSON file in `src/data/cases/` following this structure:
       "id": "diagnosis_id",
       "name": "Display Name",
       "prior_probability": 0.25,
-      "color": "#hex"
+      "color": "#hex",
+      "critical": { "label": "Cannot Miss", "reason": "Why this is critical" }
     }
   ],
   "actions": [
@@ -97,23 +118,35 @@ Create a new JSON file in `src/data/cases/` following this structure:
       "id": "action_id",
       "type": "history|exam|test",
       "question": "What you ask/do",
-      "cost": 0,
+      "description": "Clinical rationale",
+      "cost": 1,
       "answer": "What you find",
-      "lr": {
-        "diagnosis_id": 2.5,
-        "other_diagnosis": 0.5
-      }
+      "lr": { "diagnosis_id": 2.5 },
+      "potential_findings": [
+        {
+          "finding": "Finding name",
+          "description": "What it means",
+          "lr": { "diagnosis_id": 2.5 }
+        }
+      ]
     }
-  ]
+  ],
+  "educational_feedback": {
+    "diagnosis_id": {
+      "explanation": "...",
+      "key_findings": ["..."],
+      "clinical_pearl": "..."
+    }
+  }
 }
 ```
 
 ### Finding Likelihood Ratios
 
 Good sources for evidence-based LRs:
-- **McGee's Evidence-Based Physical Diagnosis**
 - **JAMA Rational Clinical Examination series**
-- **UpToDate** (sensitivity/specificity → convert to LRs)
+- **McGee's Evidence-Based Physical Diagnosis**
+- **UpToDate** (sensitivity/specificity -- convert to LRs)
 - **PubMed** systematic reviews
 
 To convert sensitivity/specificity to LRs:
@@ -122,34 +155,22 @@ LR+ = sensitivity / (1 - specificity)
 LR- = (1 - sensitivity) / specificity
 ```
 
-## Future Enhancements
+## Tech Stack
 
-- [ ] Multiple cases with case selector
-- [ ] Difficulty levels
-- [ ] Timed mode
-- [ ] Leaderboard
-- [ ] Detailed explanations for each finding
-- [ ] Sound effects for probability shifts
-- [ ] Mobile-responsive design
-
-## Clinical Cases Included
-
-### Dizziness (dizziness_001)
-**Differential:** BPPV, Vestibular Neuritis, Vestibular Migraine, Meniere's Disease, Orthostatic Hypotension, Posterior Stroke
-
-**Teaching points:**
-- TiTrATE approach (Timing, Triggers, Targeted Exam)
-- HINTS exam for acute vestibular syndrome
-- Red flags for central causes
+- React 18
+- Vite 7
+- Tailwind CSS 3.4
 
 ## License
 
-MIT - Feel free to use for educational purposes.
+MIT -- Feel free to use for educational purposes.
 
 ## Credits
 
 Likelihood ratios derived from:
 - Kattah JC et al. Stroke 2009 (HINTS exam)
 - Halker RB et al. Neurologist 2008 (Dix-Hallpike)
-- AAFP clinical reviews on dizziness
-- Bárány Society diagnostic criteria
+- Detsky ME et al. JAMA 2006 (migraine POUND mnemonic)
+- Attia J et al. JAMA 1999 (meningitis clinical findings)
+- van der Geest et al. JAMA Internal Medicine 2020 (GCA)
+- Perry JJ et al. BMJ 2011 (Ottawa SAH Rule)
